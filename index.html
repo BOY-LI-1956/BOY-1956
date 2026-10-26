@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>BOY 的個人網頁｜做一個可以走出醫院的護師</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Google Fonts: Noto Sans TC & Noto Serif TC -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&family=Noto+Serif+TC:wght@600;700&display=swap" rel="stylesheet">
+    
+    <!-- 第一版專屬柔和色系設定 (Warm Oatmeal + Soft Sand + Sage Green + Warm Wood Gold) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        oat: '#FAF8F5',          // 主背景：燕麥暖白
+                        sand: '#F3EFEA',         // 次背景：淺米杏色
+                        warmBorder: '#E6E0D6',   // 卡片邊框：暖沙色
+                        sage: {
+                            light: '#EBF1EE',    // 鼠尾草淺底
+                            DEFAULT: '#5C8374',  // 鼠尾草主色
+                            dark: '#436457'      // 鼠尾草深色
+                        },
+                        amberWarm: {
+                            light: '#F7EFE4',    // 暖木金淺底
+                            DEFAULT: '#C59B6D',  // 暖木金主色
+                            dark: '#9E7649'      // 暖木金深字
+                        },
+                        charcoal: '#2C3330',     // 主標題深炭色
+                        bodyText: '#4A5550',     // 內文柔和深灰
+                        muted: '#68706C'         // 輔助文字灰
+                    },
+                    fontFamily: {
+                        sans: ['"Noto Sans TC"', 'sans-serif'],
+                        serif: ['"Noto Serif TC"', 'serif']
+                    },
+                    boxShadow: {
+                        'soft': '0 12px 32px -10px rgba(44, 51, 48, 0.06)',
+                        'soft-lg': '0 20px 40px -15px rgba(44, 51, 48, 0.10)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #FAF8F5;
+            color: #2C3330;
+            font-family: 'Noto Sans TC', sans-serif;
+            overflow-x: hidden;
+        }
+        /* 第一版柔和背景光暈 */
+        .hero-soft-bg {
+            background: radial-gradient(circle at 85% 15%, rgba(197, 155, 109, 0.12), transparent 42%),
+                        radial-gradient(circle at 12% 82%, rgba(92, 131, 116, 0.10), transparent 45%),
+                        #FAF8F5;
+        }
+        /* 超過半身形象照：自然暖光微調，100% 乾淨無遮擋 */
+        .portrait-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center top;
+            filter: brightness(1.12) contrast(0.97) saturate(1.04) sepia(0.03);
+            transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .portrait-card:hover .portrait-img {
+            transform: scale(1.015);
+        }
+        /* 單行副標題自適應字級，確保手機與電腦皆在同一行不跨行 */
+        .single-line-subtitle {
+            font-size: clamp(0.875rem, 2.5vw, 1.25rem);
+            white-space: nowrap;
+        }
+        /* 視角切換淡入動畫 */
+        .view-page {
+            animation: fadeInPage 0.3s ease-out;
+        }
+        @keyframes fadeInPage {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-sage selection:text-white">
+
+    <!-- ========================================== -->
+    <!-- 頂部固定導覽列 (自動適應手機與電腦螢幕)      -->
+    <!-- ========================================== -->
+    <header class="sticky top-0 z-40 bg-oat/90 backdrop-blur-md border-b border-warmBorder">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- 左側品牌標誌 -->
+            <button onclick="switchView('home')" class="flex items-center gap-3 text-left group focus:outline-none">
+                <div class="w-10 h-10 rounded-xl bg-sage text-white flex items-center justify-center font-serif font-bold text-lg shadow-sm group-hover:bg-sage-dark transition-colors">
+                    B
+                </div>
+                <div>
+                    <span class="font-serif font-bold text-charcoal tracking-wide block leading-none text-base sm:text-lg">BOY 的個人網頁</span>
+                    <span class="text-xs text-muted block mt-1">做一位走得出醫院的護師</span>
+                </div>
+            </button>
+
+            <!-- 電腦版導覽列 (md 以上自動顯示) -->
+            <nav class="hidden md:flex items-center gap-1 lg:gap-1.5 text-sm font-medium">
+                <button onclick="switchView('home')" id="nav-home" class="px-3 py-2 rounded-xl text-sage-dark bg-sage-light/70 font-semibold transition-colors">個人首頁總覽</button>
+                <button onclick="navigateSection('about')" class="px-3 py-2 rounded-xl text-bodyText hover:text-sage-dark hover:bg-sand transition-colors">關於我</button>
+                <button onclick="navigateSection('expertise')" class="px-3 py-2 rounded-xl text-bodyText hover:text-sage-dark hover:bg-sand transition-colors">專業領域</button>
+                <button onclick="navigateSection('credentials')" class="px-3 py-2 rounded-xl text-bodyText hover:text-sage-dark hover:bg-sand transition-colors">經歷與證照</button>
+                <button onclick="switchView('stocks')" id="nav-stocks" class="px-3.5 py-2 rounded-xl text-bodyText hover:text-amberWarm-dark hover:bg-amberWarm-light/60 transition-colors">李人講股</button>
+                <button onclick="switchView('videos')" id="nav-videos" class="px-3.5 py-2 rounded-xl text-bodyText hover:text-sage-dark hover:bg-sage-light/60 transition-colors">影音作品</button>
+                <a href="https://line.me/ti/p/CI-OT5rDgZ" target="_blank" rel="noopener noreferrer" class="ml-1.5 px-4 py-2 rounded-xl bg-sage text-white hover:bg-sage-dark transition-colors shadow-sm font-semibold">
+                    LINE 聯繫
+                </a>
+            </nav>
+
+            <!-- 手機版漢堡選單按鈕 (小螢幕自動顯示) -->
+            <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-xl text-charcoal hover:bg-sand focus:outline-none" aria-label="開啟選單">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- 手機版展開下拉選單 -->
+        <div id="mobile-menu" class="hidden md:hidden bg-oat border-b border-warmBorder px-4 pt-2 pb-4 space-y-2 shadow-soft">
+            <div class="grid grid-cols-2 gap-2 pb-2 border-b border-warmBorder">
+                <button onclick="switchView('home'); toggleMobileMenu()" class="text-left px-3 py-2 rounded-lg text-sm font-medium text-charcoal hover:bg-sand">個人首頁總覽</button>
+                <button onclick="navigateSection('about'); toggleMobileMenu()" class="text-left px-3 py-2 rounded-lg text-sm font-medium text-charcoal hover:bg-sand">關於我</button>
+                <button onclick="navigateSection('expertise'); toggleMobileMenu()" class="text-left px-3 py-2 rounded-lg text-sm font-medium text-charcoal hover:bg-sand">專業領域</button>
+                <button onclick="navigateSection('credentials'); toggleMobileMenu()" class="text-left px-3 py-2 rounded-lg text-sm font-medium text-charcoal hover:bg-sand">經歷與證照</button>
+            </div>
+            <div class="pt-1 grid grid-cols-2 gap-2">
+                <button onclick="switchView('stocks'); toggleMobileMenu()" class="py-2.5 px-3 rounded-xl bg-amberWarm-light text-amberWarm-dark font-semibold text-sm flex items-center justify-center gap-1.5 border border-amberWarm/30">
+                    📈 李人講股
+                </button>
+                <button onclick="switchView('videos'); toggleMobileMenu()" class="py-2.5 px-3 rounded-xl bg-sage-light text-sage-dark font-semibold text-sm flex items-center justify-center gap-1.5 border border-sage/30">
+                    🎬 影音作品
+                </button>
+            </div>
+            <div class="pt-1">
+                <a href="https://line.me/ti/p/CI-OT5rDgZ" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 px-4 rounded-xl bg-sage text-white font-semibold text-sm flex items-center justify-center shadow-sm">
+                    LINE 聯繫
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========================================================== -->
+    <!-- 視角 1：個人首頁總覽 (#view-home)                          -->
+    <!-- ========================================================== -->
+    <main id="view-home" class="view-page">
+
+        <!-- 區塊 1：首頁主視覺 (Hero Section) -->
+        <section id="hero" class="hero-soft-bg py-10 sm:py-14 md:py-20 border-b border-warmBorder/80">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                    
+                    <!-- 左欄：主標題、單行副標、核心故事與按鈕 (7 cols on desktop) -->
+                    <div class="lg:col-span-7 space-y-6">
+                        <!-- 頂部榮譽膠囊標籤 -->
+                        <div class="inline-flex flex-wrap items-center gap-2 px-3.5 py-1.5 rounded-full bg-amberWarm-light border border-amberWarm/30 text-amberWarm-dark text-xs sm:text-sm font-semibold shadow-sm">
+                            <span>🏆 2026 台北市績優護理師</span>
+                            <span class="text-warmBorder">|</span>
+                            <span>急重症 × 傷口照護 × 高齡肌力</span>
+                        </div>
+
+                        <!-- 主標題 (保留第一版配色與暖木金波浪引線) & 副標題 (強制單行不跨行) -->
+                        <div class="space-y-4">
+                            <h1 class="text-3xl sm:text-4xl lg:text-[42px] font-serif font-bold text-charcoal tracking-tight leading-tight">
+                                做一個<span class="relative inline-block text-sage pb-2">可以走出醫院的護師
+                                    <!-- 第一版暖木金波浪引線 SVG -->
+                                    <svg class="absolute left-0 -bottom-1 w-full h-3 text-amberWarm" viewBox="0 0 240 14" fill="none" preserveAspectRatio="none">
+                                        <path d="M2 9C14 3 26 15 38 9C50 3 62 15 74 9C86 3 98 15 110 9C122 3 134 15 146 9C158 3 170 15 182 9C194 3 206 15 218 9C226 5 232 7 238 9" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/>
+                                    </svg>
+                                </span>
+                            </h1>
+
+                            <!-- 副標題：嚴格同一行不可跨行 -->
+                            <p class="single-line-subtitle text-bodyText font-medium overflow-hidden text-ellipsis pt-1">
+                                以實證護理傷患；以興趣照福人群
+                            </p>
+                        </div>
+
+                        <!-- 為什麼會說「走得出」醫院的護理師？ -->
+                        <div class="bg-sand/75 rounded-2xl p-6 border border-warmBorder shadow-soft space-y-3">
+                            <div class="flex items-start gap-3.5">
+                                <div class="w-9 h-9 rounded-xl bg-sage-light text-sage-dark flex items-center justify-center shrink-0 mt-0.5">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                    </svg>
+                                </div>
+                                <div class="space-y-2.5">
+                                    <h2 class="font-bold text-charcoal text-base sm:text-lg">為什麼會說「走得出」醫院的護理師？</h2>
+                                    <p class="text-sm sm:text-base text-bodyText leading-relaxed">
+                                        以不倒翁健走杖為例，進行肌力訓練的場所不一定會在醫院，可能在社區活動中心、可能在家裡，而虛弱的長輩，更可能是在床上或是輪椅上，因此護理師的角色不只侷限在醫院內。
+                                    </p>
+                                    <p class="text-sm sm:text-base text-charcoal font-semibold leading-relaxed">
+                                        將解剖生理學融入運動，讓受訓者了解生理機轉，預防運動傷害。
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 三顆主行動按鈕 -->
+                        <div class="flex flex-wrap items-center gap-3 pt-1">
+                            <button onclick="navigateSection('expertise')" class="px-6 py-3 rounded-xl bg-sage text-white font-semibold text-sm hover:bg-sage-dark transition-all shadow-sm flex items-center gap-2">
+                                <span>臨床與教學專長 ↘</span>
+                            </button>
+                            <button onclick="switchView('stocks')" class="px-5 py-3 rounded-xl bg-white text-charcoal border border-warmBorder hover:border-amberWarm hover:bg-amberWarm-light/40 font-semibold text-sm transition-all flex items-center gap-2 shadow-sm">
+                                <span>📈 李人講股</span>
+                            </button>
+                            <button onclick="switchView('videos')" class="px-5 py-3 rounded-xl bg-white text-charcoal border border-warmBorder hover:border-sage hover:bg-sage-light/50 font-semibold text-sm transition-all flex items-center gap-2 shadow-sm">
+                                <span>🎬 影音作品</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 右欄：100% 無遮擋「超過半身」個人形象照展示框（無底部白框、無下方測試文字） -->
+                    <div class="lg:col-span-5">
+                        <div class="bg-white rounded-3xl p-3.5 sm:p-4 border border-warmBorder shadow-soft-lg max-w-md mx-auto">
+                            <label for="portrait-file-input" class="portrait-card cursor-pointer relative block w-full aspect-[3/4] rounded-2xl overflow-hidden bg-[#4A463F] border border-warmBorder/60">
+                                <img id="hero-portrait-img"
+                                     src="個人形象照_2.jpg"
+                                     onerror="handlePortraitFallback(this)"
+                                     alt="BOY 個人形象照"
+                                     class="portrait-img" />
+
+                                <!-- 若雲端預覽尚未讀取到本機圖檔時的簡潔選取提示 (一旦載入照片即 100% 隱藏) -->
+                                <div id="portrait-fallback-overlay" class="hidden absolute inset-0 bg-[#3B3833]/95 flex flex-col items-center justify-center p-6 text-center text-white">
+                                    <div class="w-12 h-12 rounded-2xl bg-amberWarm/20 border border-amberWarm/40 flex items-center justify-center mb-3 text-amberWarm">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                    </div>
+                                    <p class="font-serif font-bold text-base mb-1">點此選取「個人形象照_2.jpg」</p>
+                                    <p class="text-xs text-white/75 leading-relaxed">
+                                        選取後將自動記憶並呈現無遮擋的超過半身形象照
+                                    </p>
+                                </div>
+                            </label>
+                            <input id="portrait-file-input" type="file" accept="image/*" class="hidden" onchange="loadUserPortrait(event)">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 區塊 2：關於我 (#about) -->
+        <section id="about" class="py-14 sm:py-16 md:py-20 bg-sand/70 border-b border-warmBorder">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-white rounded-3xl p-6 sm:p-10 border border-warmBorder shadow-soft space-y-5">
+                    <div class="space-y-2">
+                        <span class="inline-block text-xs font-bold uppercase tracking-wider text-sage-dark bg-sage-light px-3 py-1 rounded-full">
+                            ABOUT ME
+                        </span>
+                        <h2 class="text-2xl sm:text-3xl font-serif font-bold text-charcoal">
+                            關於我
+                        </h2>
+                    </div>
+
+                    <p class="text-sm sm:text-base text-bodyText leading-relaxed">
+                        不以己利為優先，我所做的事都是我覺得可以幫助人的，在護理的工作上，我會試著用身邊可以找到的資源去幫助有困難的病人；在人際關懷上，我幫同事的親人無償做回憶錄、幫退休醫師做生涯榮退影片以及朋友的婚紗紀錄；在業外興趣上，我成立李人講股的社群，免費教大家如何觀察集中市場；在婚姻感情上，我策劃了求婚以及宴會的流程，歡迎您往下看瞭解更多關於我的事蹟
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 區塊 3：專業領域 (#expertise) -->
+        <section id="expertise" class="py-14 sm:py-16 md:py-24 bg-oat">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="max-w-3xl">
+                    <span class="text-xs font-bold uppercase tracking-wider text-sage-dark bg-sage-light px-3 py-1 rounded-full">CORE EXPERTISE</span>
+                    <h2 class="text-2xl sm:text-3xl font-serif font-bold text-charcoal mt-3">專業領域</h2>
+                    <p class="text-bodyText mt-2 text-sm sm:text-base">
+                        急診第一線應變能力結合長照經驗，從外傷處置到長者賦能之實證照護
+                    </p>
+                </div>
+
+                <!-- 三欄等高專業卡片 (已移除右上角「主力核心專長」標籤) -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mt-10">
+                    
+                    <!-- 卡片 1：傷口照護及敷料應用 -->
+                    <div class="bg-white rounded-3xl p-6 sm:p-7 border border-warmBorder shadow-soft hover:shadow-soft-lg transition-all flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-2xl bg-sage-light text-sage-dark flex items-center justify-center mb-5">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <rect x="3" y="6" width="18" height="12" rx="3"/>
+                                    <path d="M10 6v12M14 6v12M7 10h.01M7 14h.01M17 10h.01M17 14h.01"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-bold text-charcoal">傷口照護及敷料應用</h3>
+                            <p class="text-sm text-sage-dark font-semibold mt-1">「讓病人的傷口是髒的來，乾淨的回去。」</p>
+                            <p class="text-sm text-bodyText leading-relaxed mt-3">
+                                急診常見車禍擦挫傷、工傷、燒燙傷，然而，傷口清潔需要花時間處理，我的優勢是我有足夠的時間以及願意花時間為患者清潔傷口，在醫師同意、患者有意時，會藉由輔料保持傷口良好的生長環境。
+                            </p>
+                            <ul class="mt-4 space-y-2.5 text-xs sm:text-sm text-charcoal">
+                                <li class="flex items-start gap-2">
+                                    <span class="text-sage font-bold shrink-0">✓</span>
+                                    <span>車禍高污染擦挫傷徹底清創，否則後續即使用再好的輔料都會降低效果</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-sage font-bold shrink-0">✓</span>
+                                    <span>醫、護、病三向溝通</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-sage font-bold shrink-0">✓</span>
+                                    <span>病房慢性傷口評估及輔料建議</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-warmBorder text-xs text-muted">
+                            將濕式癒合-文獻實證應用於臨床
+                        </div>
+                    </div>
+
+                    <!-- 卡片 2：高齡護理與自立支援實踐 -->
+                    <div class="bg-white rounded-3xl p-6 sm:p-7 border border-warmBorder shadow-soft hover:shadow-soft-lg transition-all flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-2xl bg-amberWarm-light text-amberWarm-dark flex items-center justify-center mb-5">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-bold text-charcoal">高齡護理與自立支援實踐</h3>
+                            <p class="text-sm text-amberWarm-dark font-semibold mt-1">從學生時期超前部署的「不約束、重尊嚴」理念</p>
+                            <p class="text-sm text-bodyText leading-relaxed mt-3">
+                                於安養中心就業時，導入失智症課本上所提及之自立支援，在當時台灣專為高齡者設計的運動及訓練尚未普及，直至參與不倒翁健走學校，將推翻輪椅的文化，推廣至居家，並結合整合性評估，完善長者輔助資源。
+                            </p>
+                            <ul class="mt-4 space-y-2.5 text-xs sm:text-sm text-charcoal">
+                                <li class="flex items-start gap-2">
+                                    <span class="text-amberWarm-dark font-bold shrink-0">✓</span>
+                                    <span>ICOPE 長者整合性照護功能評估</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-amberWarm-dark font-bold shrink-0">✓</span>
+                                    <span>失智與高齡長者活動設計</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-amberWarm-dark font-bold shrink-0">✓</span>
+                                    <span>不倒翁健走杖肌力訓練</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-warmBorder text-xs text-muted">
+                            實務歷練：安養中心自立支援 × 不倒翁健走杖 × 長者整合性照護評估
+                        </div>
+                    </div>
+
+                    <!-- 卡片 3：訓練與指導的學以致用 -->
+                    <div class="bg-white rounded-3xl p-6 sm:p-7 border border-warmBorder shadow-soft hover:shadow-soft-lg transition-all flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-2xl bg-sage-light text-sage-dark flex items-center justify-center mb-5">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-bold text-charcoal">訓練與指導的學以致用</h3>
+                            <p class="text-sm text-sage-dark font-semibold mt-1">不倒翁學校健走杖指導員</p>
+                            <p class="text-sm text-bodyText leading-relaxed mt-3">
+                                透過不倒翁健走杖系統化的訓練，幫助長者/虛弱者在安全的情境下進行活動，所設計的活動，不僅可以提升肌力，亦能促進感官、思考、團體交流。
+                            </p>
+                            <ul class="mt-4 space-y-2.5 text-xs sm:text-sm text-charcoal">
+                                <li class="flex items-start gap-2">
+                                    <span class="text-sage font-bold shrink-0">✓</span>
+                                    <span>一對一指導教學</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-sage font-bold shrink-0">✓</span>
+                                    <span>長者會館團體課程</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-sage font-bold shrink-0">✓</span>
+                                    <span>院內教學</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-warmBorder text-xs text-muted">
+                            指導足跡：一對一民眾、長者會館、院內員工及病患
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 區塊 4：學經歷與專業認證 (#credentials) -->
+        <section id="credentials" class="py-14 sm:py-16 md:py-24 bg-sand/60 border-t border-warmBorder">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="max-w-2xl mb-10">
+                    <span class="text-xs font-bold uppercase tracking-wider text-sage-dark bg-sage-light px-3 py-1 rounded-full">CREDENTIALS & JOURNEY</span>
+                    <h2 class="text-2xl sm:text-3xl font-serif font-bold text-charcoal mt-3">學經歷與專業認證</h2>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                    
+                    <!-- 左欄：生涯重要肯定、臨床資歷與生涯歷程時間軸 (6 cols) -->
+                    <div class="lg:col-span-6 space-y-5">
+                        <!-- 生涯重要肯定 -->
+                        <div class="bg-white p-6 rounded-2xl border-2 border-amberWarm/40 shadow-soft">
+                            <span class="inline-block text-xs font-bold text-amberWarm-dark bg-amberWarm-light px-2.5 py-1 rounded-md">
+                                生涯重要肯定
+                            </span>
+                            <h3 class="text-xl font-bold text-charcoal mt-2">榮獲 績優護理師</h3>
+                            <p class="text-sm font-semibold text-amberWarm-dark mt-1">
+                                2026年度台北市績優護理師
+                            </p>
+                        </div>
+
+                        <!-- 急診臨床護理師 -->
+                        <div class="bg-white p-6 rounded-2xl border border-warmBorder shadow-soft">
+                            <span class="text-xs font-semibold text-sage-dark">目前臨床資歷：5年</span>
+                            <h3 class="text-lg font-bold text-charcoal mt-1">急診臨床護理師</h3>
+                            <p class="text-sm text-bodyText mt-1">
+                                具急救能力、燒燙傷及急慢傷處理
+                            </p>
+                        </div>
+
+                        <!-- 長期照護領域護理師 -->
+                        <div class="bg-white p-6 rounded-2xl border border-warmBorder shadow-soft">
+                            <span class="text-xs font-semibold text-sage-dark">高齡照護資歷｜約 2 年</span>
+                            <h3 class="text-lg font-bold text-charcoal mt-1">長期照護領域護理師</h3>
+                            <p class="text-sm text-bodyText mt-1">
+                                耕耘長者日常自主能力、長者功能評估、對抗肌少症
+                            </p>
+                        </div>
+
+                        <!-- 生涯歷程時間軸 (2013 ～ 至今) -->
+                        <div class="bg-white p-6 rounded-2xl border border-warmBorder shadow-soft space-y-4">
+                            <div class="flex items-center justify-between border-b border-warmBorder pb-3">
+                                <h3 class="text-base font-serif font-bold text-charcoal">生涯歷程時間軸</h3>
+                                <span class="text-xs text-muted">2013 ～ 至今</span>
+                            </div>
+                            <div class="relative pl-6 border-l-2 border-sage/35 space-y-4">
+                                <div class="relative flex flex-wrap items-center justify-between gap-2">
+                                    <div class="w-3 h-3 rounded-full bg-sage border-2 border-white absolute -left-[29px]"></div>
+                                    <span class="font-bold text-charcoal text-sm sm:text-base">急診室護理師</span>
+                                    <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-sage-light text-sage-dark">2021 ～ 至今</span>
+                                </div>
+                                <div class="relative flex flex-wrap items-center justify-between gap-2">
+                                    <div class="w-3 h-3 rounded-full bg-amberWarm border-2 border-white absolute -left-[29px]"></div>
+                                    <span class="font-bold text-charcoal text-sm sm:text-base">長照中心護理師</span>
+                                    <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amberWarm-light text-amberWarm-dark">2019 ～ 2021</span>
+                                </div>
+                                <div class="relative flex flex-wrap items-center justify-between gap-2">
+                                    <div class="w-3 h-3 rounded-full bg-muted border-2 border-white absolute -left-[29px]"></div>
+                                    <span class="font-bold text-charcoal text-sm sm:text-base">弘光科技大學</span>
+                                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-sand text-bodyText">2018 ～ 2020</span>
+                                </div>
+                                <div class="relative flex flex-wrap items-center justify-between gap-2">
+                                    <div class="w-3 h-3 rounded-full bg-muted border-2 border-white absolute -left-[29px]"></div>
+                                    <span class="font-bold text-charcoal text-sm sm:text-base">敏惠醫專</span>
+                                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-sand text-bodyText">2013 ～ 2018</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右欄：學歷背景、專業證照與教學經驗 (6 cols) -->
+                    <div class="lg:col-span-6 space-y-6">
+                        <!-- 學歷背景（無英文） -->
+                        <div class="space-y-3">
+                            <h3 class="text-lg font-serif font-bold text-charcoal">學歷背景</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="bg-white p-5 rounded-2xl border border-warmBorder shadow-soft flex items-center gap-4">
+                                    <div class="w-11 h-11 rounded-xl bg-sage-light text-sage-dark flex items-center justify-center shrink-0">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-charcoal">弘光科技大學</div>
+                                        <div class="text-xs text-muted mt-0.5">護理系｜學士</div>
+                                    </div>
+                                </div>
+                                <div class="bg-white p-5 rounded-2xl border border-warmBorder shadow-soft flex items-center gap-4">
+                                    <div class="w-11 h-11 rounded-xl bg-sand text-charcoal flex items-center justify-center shrink-0">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-charcoal">敏惠醫護管理專科學校</div>
+                                        <div class="text-xs text-muted mt-0.5">護理科｜副學士</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 專業證照與訓練認證 -->
+                        <div class="space-y-3">
+                            <h3 class="text-lg font-serif font-bold text-charcoal">專業證照與訓練認證</h3>
+                            <div class="bg-white p-5 sm:p-6 rounded-3xl border border-warmBorder shadow-soft">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div class="p-3.5 rounded-2xl bg-oat border border-warmBorder flex items-center gap-2.5">
+                                        <span class="text-sage font-bold shrink-0">✓</span>
+                                        <span class="text-sm font-semibold text-charcoal">國家高考護理師執照</span>
+                                    </div>
+                                    <div class="p-3.5 rounded-2xl bg-oat border border-warmBorder flex items-center gap-2.5">
+                                        <span class="text-sage font-bold shrink-0">✓</span>
+                                        <span class="text-sm font-semibold text-charcoal">ACLS 高級心臟救命術通過</span>
+                                    </div>
+                                    <div class="p-3.5 rounded-2xl bg-oat border border-warmBorder flex items-center gap-2.5">
+                                        <span class="text-sage font-bold shrink-0">✓</span>
+                                        <span class="text-sm font-semibold text-charcoal">基本救命術</span>
+                                    </div>
+                                    <div class="p-3.5 rounded-2xl bg-oat border border-warmBorder flex items-center gap-2.5">
+                                        <span class="text-amberWarm-dark font-bold shrink-0">✓</span>
+                                        <span class="text-sm font-semibold text-charcoal">不倒翁學校健走杖指導員</span>
+                                    </div>
+                                    <div class="p-3.5 rounded-2xl bg-oat border border-warmBorder flex items-center gap-2.5">
+                                        <span class="text-amberWarm-dark font-bold shrink-0">✓</span>
+                                        <span class="text-sm font-semibold text-charcoal">ICOPE 長者整合性照護評估</span>
+                                    </div>
+                                    <div class="p-3.5 rounded-2xl bg-oat border border-warmBorder flex items-center gap-2.5">
+                                        <span class="text-sage font-bold shrink-0">✓</span>
+                                        <span class="text-sm font-semibold text-charcoal">傷口護理專業研習</span>
+                                    </div>
+                                    <div class="p-3.5 rounded-2xl bg-oat border border-warmBorder flex items-center gap-2.5">
+                                        <span class="text-sage font-bold shrink-0">✓</span>
+                                        <span class="text-sm font-semibold text-charcoal">困難傷口癒合臨床決策研習</span>
+                                    </div>
+                                    <!-- 家庭暴力保護性通報訓練證書：單行不換行 -->
+                                    <div class="p-3.5 rounded-2xl bg-oat border border-warmBorder flex items-center gap-2 overflow-hidden">
+                                        <span class="text-sage font-bold shrink-0">✓</span>
+                                        <span class="text-xs sm:text-[13px] font-semibold text-charcoal whitespace-nowrap">家庭暴力保護性通報訓練證書</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 教學經驗 -->
+                        <div class="space-y-3">
+                            <h3 class="text-lg font-serif font-bold text-charcoal">教學經驗</h3>
+                            <div class="bg-white p-5 sm:p-6 rounded-2xl border border-warmBorder shadow-soft space-y-3">
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                    <div class="p-3 rounded-xl bg-oat border border-warmBorder">
+                                        <div class="text-xs font-bold text-amberWarm-dark">2024</div>
+                                        <div class="text-xs sm:text-sm font-bold text-charcoal mt-0.5">不倒翁健走杖一對一指導</div>
+                                    </div>
+                                    <div class="p-3 rounded-xl bg-oat border border-warmBorder">
+                                        <div class="text-xs font-bold text-amberWarm-dark">2025</div>
+                                        <div class="text-xs sm:text-sm font-bold text-charcoal mt-0.5">不倒翁健走杖課程助教</div>
+                                    </div>
+                                    <div class="p-3 rounded-xl bg-sage-light/70 border border-sage/30">
+                                        <div class="text-xs font-bold text-sage-dark">2026</div>
+                                        <div class="text-xs sm:text-sm font-bold text-charcoal mt-0.5">不倒翁健走杖團體課程講師</div>
+                                    </div>
+                                </div>
+                                <div class="text-xs sm:text-sm text-bodyText pt-1 flex items-center gap-2">
+                                    <span class="text-sage font-bold">●</span>
+                                    <span>急診傷口衛教、長者功能促進教學等</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 區塊 5：個人特色與興趣園地 (#features) -->
+        <section id="features" class="py-14 sm:py-16 md:py-24 bg-oat border-t border-warmBorder">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-amberWarm-dark bg-amberWarm-light px-3 py-1 rounded-full">PERSONAL FEATURES</span>
+                    <h2 class="text-2xl sm:text-3xl font-serif font-bold text-charcoal mt-3">個人特色與興趣園地</h2>
+                    <p class="text-bodyText mt-1.5 text-sm sm:text-base">
+                        利用興趣幫助他人，讓我把興趣做得更有動力。
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mt-10">
+
+                    <!-- 卡片 1：李人講股｜股市分析專區 -->
+                    <div class="bg-white rounded-3xl p-6 sm:p-7 border-2 border-amberWarm/40 shadow-soft hover:shadow-soft-lg transition-all flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-5">
+                                <div class="w-12 h-12 rounded-2xl bg-amberWarm-light text-amberWarm-dark flex items-center justify-center text-xl">
+                                    📈
+                                </div>
+                                <span class="text-xs font-bold px-3 py-1 rounded-full bg-amberWarm-light text-amberWarm-dark">
+                                    🔥 最強破冰話題
+                                </span>
+                            </div>
+                            <h3 class="text-xl font-bold text-charcoal">📈 李人講股｜股市分析專區</h3>
+                            <p class="text-sm text-bodyText leading-relaxed mt-3">
+                                看盤跟臨床評估其實很像——都需要抽絲剝繭看懂背後的「運行機轉」。不盲從消息面，專注於研究 K 線型態、籌碼結構與交易紀律。
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-warmBorder">
+                            <button onclick="switchView('stocks')" class="w-full py-3 px-4 rounded-xl bg-amberWarm text-white font-semibold text-sm hover:bg-amberWarm-dark transition-all flex items-center justify-center gap-2 shadow-sm">
+                                <span>點此進入【李人講股】內頁簡閱</span>
+                                <span>→</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 卡片 2：視覺剪輯作品 -->
+                    <div class="bg-white rounded-3xl p-6 sm:p-7 border-2 border-sage/40 shadow-soft hover:shadow-soft-lg transition-all flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-5">
+                                <div class="w-12 h-12 rounded-2xl bg-sage-light text-sage-dark flex items-center justify-center text-xl">
+                                    🎞️
+                                </div>
+                                <span class="text-xs font-bold px-3 py-1 rounded-full bg-sage-light text-sage-dark">
+                                    🎞️ 影片記錄生命的溫度
+                                </span>
+                            </div>
+                            <h3 class="text-xl font-bold text-charcoal">🎞️ 視覺剪輯作品</h3>
+                            <p class="text-sm text-bodyText leading-relaxed mt-3">
+                                喜歡透過剪輯將零碎的畫面組織成有溫度的故事。無論是婚禮成長愛情紀錄、回憶錄與故事，透過運鏡、文字傳遞情感。
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-warmBorder">
+                            <button onclick="switchView('videos')" class="w-full py-3 px-4 rounded-xl bg-sage text-white font-semibold text-sm hover:bg-sage-dark transition-all flex items-center justify-center gap-2 shadow-sm">
+                                <span>點此進入【影音作品】內頁簡閱</span>
+                                <span>▶</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 卡片 3：傷口型態與進階敷料研究 -->
+                    <div class="bg-white rounded-3xl p-6 sm:p-7 border border-warmBorder shadow-soft hover:shadow-soft-lg transition-all flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-5">
+                                <div class="w-12 h-12 rounded-2xl bg-sand text-charcoal flex items-center justify-center text-xl">
+                                    🔬
+                                </div>
+                                <span class="text-xs font-semibold px-3 py-1 rounded-full bg-sand text-bodyText">
+                                    🩹 臨床實務鑽研
+                                </span>
+                            </div>
+                            <h3 class="text-xl font-bold text-charcoal">🔬 傷口型態與進階敷料研究</h3>
+                            <p class="text-sm text-bodyText leading-relaxed mt-3">
+                                觀察傷口型態並注重傷口微環境，致力於減少換藥時疼痛不適感以及對抗疤痕。
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-warmBorder">
+                            <button onclick="switchView('wounds')" class="w-full py-3 px-4 rounded-xl bg-sand text-charcoal font-semibold text-sm hover:bg-warmBorder transition-all flex items-center justify-center gap-2">
+                                <span>簡閱傷口照護原則</span>
+                                <span>📖</span>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 區塊 6：聯絡與合作邀約 (#contact) -->
+        <section id="contact" class="py-16 bg-sand/60 border-t border-warmBorder">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
+                <div class="w-12 h-12 rounded-2xl bg-sage-light text-sage-dark flex items-center justify-center mx-auto">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-serif font-bold text-charcoal">
+                    歡迎課程邀約、衛教合作及股市操作交流
+                </h2>
+                <p class="text-bodyText text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
+                    不倒翁健走杖課程指導、高齡肌力訓練、傷口照護或是想加入股市但不知道怎麼看K線，都歡迎與我聯繫
+                </p>
+                <div class="flex flex-wrap justify-center gap-3.5 pt-2">
+                    <a href="https://line.me/ti/p/CI-OT5rDgZ" target="_blank" rel="noopener noreferrer" class="px-6 py-3.5 rounded-xl bg-sage text-white font-semibold text-sm hover:bg-sage-dark transition-all flex items-center gap-2 shadow-sm">
+                        <span>LINE：https://line.me/ti/p/CI-OT5rDgZ</span>
+                    </a>
+                    <button onclick="copyLineUrl()" class="px-5 py-3.5 rounded-xl bg-white text-charcoal border border-warmBorder hover:bg-oat font-semibold text-sm transition-all flex items-center gap-2 shadow-sm">
+                        <span id="copy-line-label">📋 複製 LINE 連結</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ========================================================== -->
+    <!-- 視角 2：【李人講股】乾淨待建置內頁 (#view-stocks)            -->
+    <!-- ========================================================== -->
+    <section id="view-stocks" class="view-page hidden min-h-[75vh] bg-oat py-12 md:py-16">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            <div>
+                <button onclick="switchView('home')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-warmBorder text-charcoal font-semibold text-sm hover:bg-sand transition-colors shadow-sm">
+                    <span>← 返回個人首頁</span>
+                </button>
+            </div>
+            <div class="bg-white rounded-3xl p-8 sm:p-12 border border-warmBorder shadow-soft text-center space-y-4">
+                <div class="w-14 h-14 rounded-2xl bg-amberWarm-light text-amberWarm-dark flex items-center justify-center mx-auto text-2xl">
+                    📈
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-serif font-bold text-charcoal">李人講股</h1>
+                <p class="text-sm sm:text-base text-bodyText max-w-lg mx-auto leading-relaxed">
+                    此內頁目前保留空白架構，待後續提供實際看盤資料與教材後更新呈現。
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================== -->
+    <!-- 視角 3：【影音作品】乾淨待建置內頁 (#view-videos)            -->
+    <!-- ========================================================== -->
+    <section id="view-videos" class="view-page hidden min-h-[75vh] bg-oat py-12 md:py-16">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            <div>
+                <button onclick="switchView('home')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-warmBorder text-charcoal font-semibold text-sm hover:bg-sand transition-colors shadow-sm">
+                    <span>← 返回個人首頁</span>
+                </button>
+            </div>
+            <div class="bg-white rounded-3xl p-8 sm:p-12 border border-warmBorder shadow-soft text-center space-y-4">
+                <div class="w-14 h-14 rounded-2xl bg-sage-light text-sage-dark flex items-center justify-center mx-auto text-2xl">
+                    🎞️
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-serif font-bold text-charcoal">影音作品</h1>
+                <p class="text-sm sm:text-base text-bodyText max-w-lg mx-auto leading-relaxed">
+                    此內頁目前保留空白架構，待後續提供婚禮紀錄、回憶錄與榮退影片後更新呈現。
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================== -->
+    <!-- 視角 4：【傷口照護原則簡閱】乾淨待建置內頁 (#view-wounds)    -->
+    <!-- ========================================================== -->
+    <section id="view-wounds" class="view-page hidden min-h-[75vh] bg-oat py-12 md:py-16">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            <div>
+                <button onclick="switchView('home')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-warmBorder text-charcoal font-semibold text-sm hover:bg-sand transition-colors shadow-sm">
+                    <span>← 返回個人首頁</span>
+                </button>
+            </div>
+            <div class="bg-white rounded-3xl p-8 sm:p-12 border border-warmBorder shadow-soft text-center space-y-4">
+                <div class="w-14 h-14 rounded-2xl bg-sand text-charcoal flex items-center justify-center mx-auto text-2xl">
+                    🩹
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-serif font-bold text-charcoal">傷口照護原則簡閱</h1>
+                <p class="text-sm sm:text-base text-bodyText max-w-lg mx-auto leading-relaxed">
+                    此內頁目前保留空白架構，待後續提供傷口照護資料後更新呈現。
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 頁尾 (已移除重複的 2026年度台北市績優護理師 字樣) -->
+    <footer class="bg-sand border-t border-warmBorder py-8 text-center text-xs text-muted">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>© 2026 BOY 的個人網頁｜做一個可以走出醫院的護師</div>
+            <div class="flex items-center gap-4">
+                <button onclick="window.scrollTo({ top: 0, behavior: 'smooth' })" class="hover:text-sage-dark font-medium transition-colors">返回頂部 ↑</button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 互動與形象照自動讀取腳本 -->
+    <script>
+        function getSavedPortrait() {
+            try {
+                return localStorage.getItem('boy_saved_portrait_v3') ||
+                       localStorage.getItem('boy_portfolio_portrait_v2') ||
+                       localStorage.getItem('boy_portfolio_portrait');
+            } catch (e) {
+                return null;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', function() {
+            var savedImg = getSavedPortrait();
+            if (savedImg) {
+                var imgEl = document.getElementById('hero-portrait-img');
+                var fallback = document.getElementById('portrait-fallback-overlay');
+                if (imgEl) {
+                    imgEl.src = savedImg;
+                    imgEl.classList.remove('hidden');
+                }
+                if (fallback) {
+                    fallback.classList.add('hidden');
+                }
+            }
+        });
+
+        function handlePortraitFallback(imgEl) {
+            var savedImg = getSavedPortrait();
+            var fallback = document.getElementById('portrait-fallback-overlay');
+            if (savedImg && imgEl.src !== savedImg) {
+                imgEl.src = savedImg;
+                if (fallback) fallback.classList.add('hidden');
+                return;
+            }
+            if (fallback) {
+                fallback.classList.remove('hidden');
+            }
+        }
+
+        function loadUserPortrait(event) {
+            var file = event.target.files && event.target.files[0];
+            if (!file) return;
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var dataUrl = e.target.result;
+                var imgEl = document.getElementById('hero-portrait-img');
+                var fallback = document.getElementById('portrait-fallback-overlay');
+                if (imgEl) {
+                    imgEl.src = dataUrl;
+                    imgEl.classList.remove('hidden');
+                }
+                if (fallback) {
+                    fallback.classList.add('hidden');
+                }
+                try {
+                    localStorage.setItem('boy_saved_portrait_v3', dataUrl);
+                    localStorage.setItem('boy_portfolio_portrait_v2', dataUrl);
+                    localStorage.setItem('boy_portfolio_portrait', dataUrl);
+                } catch (err) {}
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function switchView(viewId) {
+            var views = ['home', 'stocks', 'videos', 'wounds'];
+            for (var i = 0; i < views.length; i++) {
+                var el = document.getElementById('view-' + views[i]);
+                if (el) {
+                    if (views[i] === viewId) {
+                        el.classList.remove('hidden');
+                    } else {
+                        el.classList.add('hidden');
+                    }
+                }
+            }
+
+            // 更新頂部導覽列重點狀態
+            var navHome = document.getElementById('nav-home');
+            var navStocks = document.getElementById('nav-stocks');
+            var navVideos = document.getElementById('nav-videos');
+            if (navHome && navStocks && navVideos) {
+                navHome.className = viewId === 'home'
+                    ? 'px-3 py-2 rounded-xl text-sage-dark bg-sage-light/70 font-semibold transition-colors'
+                    : 'px-3 py-2 rounded-xl text-bodyText hover:text-sage-dark hover:bg-sand transition-colors';
+                navStocks.className = viewId === 'stocks'
+                    ? 'px-3.5 py-2 rounded-xl text-amberWarm-dark bg-amberWarm-light font-semibold transition-colors'
+                    : 'px-3.5 py-2 rounded-xl text-bodyText hover:text-amberWarm-dark hover:bg-amberWarm-light/60 transition-colors';
+                navVideos.className = viewId === 'videos'
+                    ? 'px-3.5 py-2 rounded-xl text-sage-dark bg-sage-light font-semibold transition-colors'
+                    : 'px-3.5 py-2 rounded-xl text-bodyText hover:text-sage-dark hover:bg-sage-light/60 transition-colors';
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function navigateSection(secId) {
+            switchView('home');
+            setTimeout(function() {
+                var target = document.getElementById(secId);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 60);
+        }
+
+        function toggleMobileMenu() {
+            var menu = document.getElementById('mobile-menu');
+            if (menu) {
+                menu.classList.toggle('hidden');
+            }
+        }
+
+        function copyLineUrl() {
+            var temp = document.createElement('input');
+            temp.value = 'https://line.me/ti/p/CI-OT5rDgZ';
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+
+            var label = document.getElementById('copy-line-label');
+            label.textContent = '✅ 已複製 LINE 連結！';
+            setTimeout(function() {
+                label.textContent = '📋 複製 LINE 連結';
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
